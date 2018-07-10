@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2018 NewsHeadlines
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <!-- App name -->
+    <string name="app_name">News Headlines</string>
+
+    <!-- Card image description -->
+    <string name="article_image_description">Article image</string>
+
+    <!-- No WiFi or mobile data text -->
+    <string name="no_wifi_data_connection_text">No WiFi or Mobile data connection.</string>
+
+    <!-- Navigation drawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_subtitle">Powered by</string>
+    <string name="news_api_link_title">Powered by \u0020<a href="https://newsapi.org/">https://newsapi.org</a></string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="general_category">General</string>
+    <string name="sports_category">Sports</string>
+    <string name="technology_category">Technology</string>
+    <string name="bbc_news_title">BBC News</string>
+    <string name="google_uk_title">Google News UK</string>
+    <string name="daily_mail_title">Daily Mail</string>
+    <string name="mirror_title">Mirror</string>
+    <string name="independent_title">Independent</string>
+    <string name="the_guardian_title">The Guardian</string>
+    <string name="cnn_title">CNN</string>
+    <string name="al_jazeera_uk_title">Al Jazeera UK</string>
+    <string name="fox_news_title">Fox News</string>
+    <string name="national_geographic_title">National Geographic</string>
+    <string name="bbc_sport_title">BBC Sport</string>
+    <string name="espn_title">ESPN</string>
+    <string name="fox_sports_title">Fox Sports</string>
+    <string name="engadget_title">Engadget</string>
+    <string name="techradar_title">TechRadar</string>
+    <string name="techcrunch_title">TechCrunch</string>
+    <string name="the_verge_title">The Verge</string>
+    <string name="crypto_news_title">Crypto Coins News</string>
+</resources>

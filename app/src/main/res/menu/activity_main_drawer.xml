@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2018 NewsHeadlines
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item
+        android:id="@+id/general_cat"
+        android:title="General">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/bbc"
+                    android:icon="@drawable/bbc_news"
+                    android:title="@string/bbc_news_title" />
+                <item
+                    android:id="@+id/google_uk"
+                    android:icon="@drawable/google_news_uk"
+                    android:title="@string/google_uk_title" />
+                <item
+                    android:id="@+id/daily_mail"
+                    android:icon="@drawable/daily_mail"
+                    android:title="@string/daily_mail_title" />
+                <item
+                    android:id="@+id/mirror"
+                    android:icon="@drawable/mirror"
+                    android:title="@string/mirror_title" />
+                <item
+                    android:id="@+id/independent"
+                    android:icon="@drawable/independent"
+                    android:title="@string/independent_title" />
+                <item
+                    android:id="@+id/the_guardian_uk"
+                    android:icon="@drawable/the_guardian_uk"
+                    android:title="@string/the_guardian_title" />
+                <item
+                    android:id="@+id/cnn"
+                    android:icon="@drawable/cnn"
+                    android:title="@string/cnn_title" />
+                <item
+                    android:id="@+id/al_jazeera_english"
+                    android:icon="@drawable/al_jazeera"
+                    android:title="@string/al_jazeera_uk_title" />
+                <item
+                    android:id="@+id/fox_news"
+                    android:icon="@drawable/fox_news"
+                    android:title="@string/fox_news_title" />
+                <item
+                    android:id="@+id/national_geographic"
+                    android:icon="@drawable/national_geographic"
+                    android:title="@string/national_geographic_title" />
+            </group>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/sport_cat"
+        android:title="@string/sports_category">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/bbc_sport"
+                    android:icon="@drawable/bbc_sport"
+                    android:title="@string/bbc_sport_title" />
+                <item
+                    android:id="@+id/espn"
+                    android:icon="@drawable/espn"
+                    android:title="@string/espn_title" />
+                <item
+                    android:id="@+id/fox_sports"
+                    android:icon="@drawable/fox_sports"
+                    android:title="@string/fox_sports_title" />
+            </group>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/tech_cat"
+        android:title="Technology">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/engadget"
+                    android:icon="@drawable/engadget"
+                    android:title="@string/engadget_title" />
+                <item
+                    android:id="@+id/tech_radar"
+                    android:icon="@drawable/tech_radar"
+                    android:title="@string/techradar_title" />
+                <item
+                    android:id="@+id/tech_crunch"
+                    android:icon="@drawable/tech_crunch"
+                    android:title="@string/techcrunch_title" />
+                <item
+                    android:id="@+id/the_verge"
+                    android:icon="@drawable/the_verge"
+                    android:title="@string/the_verge_title" />
+                <item
+                    android:id="@+id/crypto_coins_news"
+                    android:icon="@drawable/crypto"
+                    android:title="@string/crypto_news_title" />
+            </group>
+        </menu>
+    </item>
+
+</menu>
