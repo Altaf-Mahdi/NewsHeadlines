@@ -22,14 +22,7 @@ import android.net.NetworkInfo;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.util.Log;
 
-import com.altafmahdi.newsheadlines.recyclerview.Article;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
-import java.util.List;
 
 public class Utils {
 
@@ -44,60 +37,6 @@ public class Utils {
             networkInfo = connectivityManager.getActiveNetworkInfo();
         }
         return networkInfo != null && networkInfo.isConnectedOrConnecting();
-    }
-
-    public static void runDownloadTask(Context context, String value, boolean search) {
-        if (DEBUG) Log.i(TAG, "Download task running");
-        DownloadTask task = new DownloadTask(context);
-        String url;
-        String apiKey = context.getResources().getString(R.string.api_key);
-
-        if (!search) {
-            if (DEBUG) Log.i(TAG, "Provider task");
-            url = "https://newsapi.org/v2/top-headlines?sources=" + value +
-                    "&apiKey=" + apiKey;
-        } else {
-            if (DEBUG) Log.i(TAG, "Search task");
-            url = "https://newsapi.org/v2/top-headlines?q=" + value +
-                    "&apiKey=" + apiKey;
-        }
-
-        task.execute(url);
-    }
-
-    public static void parseJsonData(List<Article> list, String result) {
-        try {
-            JSONObject jsonObject = new JSONObject(result);
-            JSONArray jsonArray = jsonObject.getJSONArray("articles");
-
-            if (list.size() > 0) {
-                list.clear();
-            }
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonPart = jsonArray.getJSONObject(i);
-
-                String link = jsonPart.getString("url");
-                String image = jsonPart.getString("urlToImage");
-                String title = jsonPart.getString("title");
-                String description = jsonPart.getString("description");
-
-                list.add(new Article(link, image, title, description));
-            }
-
-            for (int i = 0; i < list.size(); i++) {
-                Article article = list.get(i);
-
-                if (DEBUG) {
-                    Log.i(TAG, "Title: " + article.getTitle());
-                    Log.i(TAG, "Descripion: " + article.getDescription());
-                    Log.i(TAG, "Url: " + article.getUrlLink());
-                    Log.i(TAG, "Image: " + article.getImageUrlLink());
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     public static CircularProgressDrawable startProgressDrawable(Context context) {

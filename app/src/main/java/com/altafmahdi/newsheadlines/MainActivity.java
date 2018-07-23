@@ -22,6 +22,7 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
@@ -43,6 +44,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.altafmahdi.newsheadlines.recyclerview.Article;
+import com.altafmahdi.newsheadlines.recyclerview.ArticleUtils;
 import com.altafmahdi.newsheadlines.recyclerview.ArticlesAdapter;
 import com.thefinestartist.finestwebview.FinestWebView;
 
@@ -59,9 +61,10 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private DrawerLayout mDrawerLayout;
     private RecyclerView.LayoutManager mLayoutManager;
+    private FloatingActionButton mFloatingActionButton;
 
     private ImageView mSadFaceImage;
-    private TextView mNoIntertText;
+    private TextView mNoInternetText;
 
     private ArticlesAdapter mArticlesAdapter;
     private List<Article> mArticles;
@@ -71,11 +74,15 @@ public class MainActivity extends AppCompatActivity {
 
     private String mProvider;
     private String mToolBarTitle;
+    private String mDownloadResult;
 
     private Preferences mPreferences;
     private Resources mRes;
 
+    private DataBaseHelper mDataBaseHelper;
+
     private boolean mLastQueryWasSearch = false;
+    private boolean mForceRunTask = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,18 +94,25 @@ public class MainActivity extends AppCompatActivity {
 
         mRes = getResources();
 
+        mDataBaseHelper = new DataBaseHelper(this);
+
         mPreferences = new Preferences(this);
-        boolean firstRun = mPreferences.getBoolean("first_run", true);
+        boolean firstRun = mPreferences.getBoolean("first_run");
         if (firstRun) {
             mPreferences.saveBoolean("first_run", false);
             mPreferences.saveString("provider", "bbc-news");
+            mPreferences.saveBoolean("querySearch", false);
             mPreferences.saveString("toolbar_title",
                     mRes.getString(R.string.bbc_news_title));
+            mForceRunTask = true;
         }
 
         mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         mSwipeRefreshLayout.setColorSchemeColors(Utils.refreshColors(this));
         mSwipeRefreshLayout.setOnRefreshListener(mSwipeRefreshListener);
+
+        mFloatingActionButton = findViewById(R.id.fab);
+        mFloatingActionButton.setOnClickListener(mFabListener);
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -119,6 +133,8 @@ public class MainActivity extends AppCompatActivity {
                 IntentFilter("com.altafmahdi.newsheadlines.download.result");
         registerReceiver(mIntentReceiver, mIntentFilter);
 
+        ArticleUtils.loadDataFromDataBase(mArticles, mDataBaseHelper);
+
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mArticlesAdapter);
@@ -126,14 +142,11 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mSadFaceImage = findViewById(R.id.sad_face_image);
-        mNoIntertText = findViewById(R.id.no_internet_text);
+        mNoInternetText = findViewById(R.id.no_internet_text);
 
-        if (Utils.isNetworkAvailable(this)) {
-            Utils.runDownloadTask(this, mPreferences.getString("provider"),
-                    false);
-        } else {
+        if (!Utils.isNetworkAvailable(this)) {
             mSadFaceImage.setVisibility(View.VISIBLE);
-            mNoIntertText.setVisibility(View.VISIBLE);
+            mNoInternetText.setVisibility(View.VISIBLE);
             mRecyclerView.setVisibility(View.GONE);
         }
     }
@@ -143,12 +156,22 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         mSwipeRefreshLayout.setEnabled(true);
         mToolBar.setTitle(mPreferences.getString("toolbar_title"));
+        if (Utils.isNetworkAvailable(this)) {
+            String provider = mPreferences.getString("provider");
+            String search = mPreferences.getString("search");
+            if (mPreferences.getBoolean("querySearch")) {
+                runTask(search, true);
+            } else {
+                runTask(provider, false);
+            }
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         Utils.deleteCache(getApplicationContext());
+        ArticleUtils.saveDataToDataBase(mArticles, mDataBaseHelper);
     }
 
     @Override
@@ -171,8 +194,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mPreferences.saveString("search", query);
-                runTask(query, true);
+                mPreferences.saveBoolean("querySearch", true);
                 mLastQueryWasSearch = true;
+                mForceRunTask = true;
+                runTask(query, true);
                 item.collapseActionView();
                 return true;
             }
@@ -189,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
             new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
+            mForceRunTask = true;
             String provider = mPreferences.getString("provider");
             String search = mPreferences.getString("search");
             if (mLastQueryWasSearch) {
@@ -196,6 +222,15 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 runTask(provider, false);
             }
+        }
+    };
+
+    private FloatingActionButton.OnClickListener mFabListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            ArticleUtils.parseJsonData(mArticles, mDownloadResult, true);
+            mArticlesAdapter.notifyDataSetChanged();
+            mFloatingActionButton.setVisibility(View.GONE);
         }
     };
 
@@ -263,12 +298,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
             mLastQueryWasSearch = false;
-            mSwipeRefreshLayout.setRefreshing(true);
+            mForceRunTask = true;
+            mPreferences.saveBoolean("querySearch", false);
             mPreferences.saveString("provider", mProvider);
             mPreferences.saveString("toolbar_title", mToolBarTitle);
+            mSwipeRefreshLayout.setRefreshing(true);
             mToolBar.setTitle(mToolBarTitle);
-            runTask(mProvider, false);
             mDrawerLayout.closeDrawer(GravityCompat.START);
+            runTask(mProvider, false);
             return true;
         }
     };
@@ -295,9 +332,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void runTask(String provider, boolean search) {
         if (Utils.isNetworkAvailable(this)) {
-            Utils.runDownloadTask(MainActivity.this, provider, search);
+            ArticleUtils.runDownloadTask(MainActivity.this, provider, search);
             mSadFaceImage.setVisibility(View.GONE);
-            mNoIntertText.setVisibility(View.GONE);
+            mNoInternetText.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.VISIBLE);
             mLayoutManager.scrollToPosition(0);
             registerReceiver(mIntentReceiver, mIntentFilter);
@@ -312,11 +349,16 @@ public class MainActivity extends AppCompatActivity {
     private class IntentReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String result = intent.getStringExtra("download_result");
-            if (DEBUG) Log.i(TAG,"News: " + result);
-            Utils.parseJsonData(mArticles, result);
-            mArticlesAdapter.notifyDataSetChanged();
+            mDownloadResult = intent.getStringExtra("download_result");
+            if (DEBUG) Log.i(TAG,"News: " + mDownloadResult);
+            ArticleUtils.parseJsonData(mArticles, mDownloadResult, mForceRunTask);
+            if (ArticleUtils.hasDataChanged(mDataBaseHelper) && !mForceRunTask) {
+                mFloatingActionButton.setVisibility(View.VISIBLE);
+            } else if (mForceRunTask) {
+                mArticlesAdapter.notifyDataSetChanged();
+            }
             mSwipeRefreshLayout.setRefreshing(false);
+            mForceRunTask = false;
             unregisterReceiver(this);
         }
     }

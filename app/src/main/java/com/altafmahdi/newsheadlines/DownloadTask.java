@@ -30,7 +30,7 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
 
     private Context mContext;
 
-    DownloadTask(Context context) {
+    public DownloadTask(Context context) {
         mContext = context;
     }
 

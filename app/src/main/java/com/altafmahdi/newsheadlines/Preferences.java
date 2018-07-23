@@ -44,8 +44,8 @@ public class Preferences {
         prefs.edit().putBoolean(name, value).apply();
     }
 
-    public boolean getBoolean(String name, boolean firstRun) {
-        return prefs.getBoolean(name, firstRun);
+    public boolean getBoolean(String name) {
+        return prefs.getBoolean(name, true);
     }
 
     public void saveStringSet(String name, Set<String> list) {
