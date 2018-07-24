@@ -195,6 +195,8 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 mPreferences.saveString("search", query);
                 mPreferences.saveBoolean("querySearch", true);
+                mPreferences.saveString("toolbar_title", query);
+                mToolBar.setTitle(query);
                 mLastQueryWasSearch = true;
                 mForceRunTask = true;
                 runTask(query, true);
@@ -230,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             ArticleUtils.parseJsonData(mArticles, mDownloadResult, true);
             mArticlesAdapter.notifyDataSetChanged();
-            mFloatingActionButton.setVisibility(View.GONE);
+            Utils.animateFab(v, false);
         }
     };
 
@@ -353,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
             if (DEBUG) Log.i(TAG,"News: " + mDownloadResult);
             ArticleUtils.parseJsonData(mArticles, mDownloadResult, mForceRunTask);
             if (ArticleUtils.hasDataChanged(mDataBaseHelper) && !mForceRunTask) {
-                mFloatingActionButton.setVisibility(View.VISIBLE);
+                Utils.animateFab(mFloatingActionButton, true);
             } else if (mForceRunTask) {
                 mArticlesAdapter.notifyDataSetChanged();
             }

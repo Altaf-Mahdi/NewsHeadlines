@@ -15,12 +15,15 @@
  */
 package com.altafmahdi.newsheadlines;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.util.Log;
+import android.view.View;
 
 import java.io.File;
 
@@ -83,6 +86,36 @@ public class Utils {
             }
         }
         return dir != null && dir.delete();
+    }
+
+    public static void animateFab(final View view, boolean show) {
+        if (show) {
+            view.animate()
+                    .scaleX(1)
+                    .scaleY(1)
+                    .alpha(1f)
+                    .setDuration(300)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            super.onAnimationStart(animation);
+                            view.setVisibility(View.VISIBLE);
+                        }
+                    });
+        } else {
+            view.animate()
+                    .scaleX(0)
+                    .scaleY(0)
+                    .alpha(0f)
+                    .setDuration(300)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            view.setVisibility(View.GONE);
+                        }
+                    });
+        }
     }
 
     /*public static void openFragment(FragmentActivity activity, Fragment fragment) {
