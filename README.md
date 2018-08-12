@@ -14,7 +14,7 @@ You will need to add the following string resource with your own API key from [N
 
 ## Screenshots
 
-![alt text](https://db.tt/C0mSbNDhAC) ![alt text](https://db.tt/k5Sp9PcDC7) ![alt text](https://db.tt/nHuGRtG3lt)
+![Alt text](https://github.com/Altaf-Mahdi/NewsHeadlines/blob/master/screenshots/Screenshot_20180812-183415_News%20Headlines.jpg) ![Alt text](https://github.com/Altaf-Mahdi/NewsHeadlines/blob/master/screenshots/Screenshot_20180812-183432_News%20Headlines.jpg) ![Alt text](https://github.com/Altaf-Mahdi/NewsHeadlines/blob/master/screenshots/Screenshot_20180812-183441_News%20Headlines.jpg)
 
 ## License
 
