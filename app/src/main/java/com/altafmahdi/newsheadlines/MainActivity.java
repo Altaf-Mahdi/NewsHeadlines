@@ -154,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mSwipeRefreshLayout.setEnabled(true);
+
         mToolBar.setTitle(mPreferences.getString("toolbar_title"));
         if (Utils.isNetworkAvailable(this)) {
             String provider = mPreferences.getString("provider");
@@ -164,6 +165,19 @@ public class MainActivity extends AppCompatActivity {
                 runTask(provider, false);
             }
         }
+
+        mRecyclerView.scrollToPosition(mPreferences.getInt("position"));
+        mRecyclerView.scrollBy(0, - mPreferences.getInt("offset"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        View firstChild = mRecyclerView.getChildAt(0);
+        int firstVisiblePosition = mRecyclerView.getChildAdapterPosition(firstChild);
+        int offset = firstChild.getTop();
+        mPreferences.saveInt("position", firstVisiblePosition);
+        mPreferences.saveInt("offset", offset);
     }
 
     @Override
@@ -171,6 +185,13 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         Utils.deleteCache(getApplicationContext());
         ArticleUtils.saveDataToDataBase(mArticles, mDataBaseHelper);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPreferences.saveInt("position", 0);
+        mPreferences.saveInt("offset", 0);
     }
 
     @Override
