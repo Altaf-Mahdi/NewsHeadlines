@@ -46,7 +46,6 @@ import android.widget.Toast;
 import com.altafmahdi.newsheadlines.recyclerview.Article;
 import com.altafmahdi.newsheadlines.recyclerview.ArticleUtils;
 import com.altafmahdi.newsheadlines.recyclerview.ArticlesAdapter;
-import com.thefinestartist.finestwebview.FinestWebView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -185,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main_menu, menu);
 
         final MenuItem item = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) item.getActionView();
@@ -318,21 +317,10 @@ public class MainActivity extends AppCompatActivity {
         public void onItemClick(int item) {
             Article mArticle = mArticles.get(item);
             String url = mArticle.getUrlLink();
-            int colorWhite = mRes.getColor(android.R.color.white);
-            int colorYellow = mRes.getColor(android.R.color.holo_orange_light);
 
-            new FinestWebView.Builder(MainActivity.this)
-                    .swipeRefreshColors(Utils.refreshColors(MainActivity.this))
-                    .setCustomAnimations(R.anim.activity_open_enter, R.anim.activity_open_exit,
-                            R.anim.activity_close_enter, R.anim.activity_close_exit)
-                    .iconDefaultColor(colorWhite)
-                    .titleColor(colorWhite)
-                    .urlColor(colorWhite)
-                    .progressBarColor(colorYellow)
-                    .showIconBack(true)
-                    .showIconForward(true)
-                    .dividerColor(colorWhite)
-                    .show(url);
+            Intent intent = new Intent(MainActivity.this, WebActivity.class);
+            intent.putExtra("url", url);
+            startActivity(intent);
         }
     };
 

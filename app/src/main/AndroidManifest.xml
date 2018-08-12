@@ -21,15 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".MainActivity"
-            android:screenOrientation="portrait">
-        </activity>
-
         <activity
-            android:name="com.thefinestartist.finestwebview.FinestWebViewActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/WebView.NoActionBar" />
+            android:name=".MainActivity">
+        </activity>
+        <activity
+            android:name=".WebActivity">
+        </activity>
     </application>
 
 </manifest>
