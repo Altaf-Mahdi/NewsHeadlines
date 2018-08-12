@@ -17,6 +17,7 @@ package com.altafmahdi.newsheadlines;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ public class WebActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private WebView mWebView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private NestedScrollView mNestedScrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,8 @@ public class WebActivity extends AppCompatActivity {
         mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         mSwipeRefreshLayout.setColorSchemeColors(Utils.refreshColors(this));
         mSwipeRefreshLayout.setOnRefreshListener(mSwipeRefreshListener);
+
+        mNestedScrollView = findViewById(R.id.nested_scroll_view);
     }
 
     @Override
@@ -129,6 +133,7 @@ public class WebActivity extends AppCompatActivity {
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
             mSwipeRefreshLayout.setRefreshing(false);
+            mNestedScrollView.scrollTo(0, 0);
         }
     }
 }
