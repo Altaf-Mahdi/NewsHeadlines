@@ -30,17 +30,38 @@ import com.altafmahdi.newsheadlines.Utils;
 
 import java.util.List;
 
-public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.MyViewHolder> {
+public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context mContext;
     private List<Article> mArticleList;
     private OnItemClickListener mClickListener;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder1 extends RecyclerView.ViewHolder {
         public TextView title, description;
         public ImageView image;
 
-        MyViewHolder(View itemView) {
+        MyViewHolder1(View itemView) {
+            super(itemView);
+            image = itemView.findViewById(R.id.image);
+            title = itemView.findViewById(R.id.title);
+            description = itemView.findViewById(R.id.description);
+        }
+
+        void bind(final int item, final OnItemClickListener clickListener) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clickListener.onItemClick(item);
+                }
+            });
+        }
+    }
+
+    public class MyViewHolder2 extends RecyclerView.ViewHolder {
+        public TextView title, description;
+        public ImageView image;
+
+        MyViewHolder2(View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.image);
             title = itemView.findViewById(R.id.title);
@@ -64,28 +85,64 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.MyView
         mClickListener = clickListener;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        int viewType = 1;
+        if (position == 0) viewType = 0;
+        return viewType;
+    }
+
     @NonNull
     @Override
-    public ArticlesAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                            int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.article_card,
-                parent, false);
-        return new MyViewHolder(itemView);
+        switch (viewType) {
+            case 0:
+                View itemViewMain = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.article_card_main, parent, false);
+                return new MyViewHolder1(itemViewMain);
+            case 1:
+                View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.article_card,
+                        parent, false);
+                return new MyViewHolder2(itemView);
+            default:
+                return null;
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ArticlesAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Article article = mArticleList.get(position);
-        holder.bind(position, mClickListener);
+        switch (holder.getItemViewType()) {
+            case 0:
+                MyViewHolder1 holder1 = (MyViewHolder1) holder;
+                holder1.bind(position, mClickListener);
 
-        GlideApp.with(mContext)
-                .load(article.getImageUrlLink())
-                .centerCrop()
-                .placeholder(Utils.startProgressDrawable(mContext))
-                .into(holder.image);
+                GlideApp.with(mContext)
+                        .load(article.getImageUrlLink())
+                        .centerCrop()
+                        .placeholder(Utils.startProgressDrawable(mContext))
+                        .into(holder1.image);
 
-        holder.title.setText(article.getTitle());
-        holder.description.setText(article.getDescription());
+                holder1.title.setText(article.getTitle());
+                holder1.description.setText(article.getDescription());
+                break;
+            case 1:
+                MyViewHolder2 holder2 = (MyViewHolder2) holder;
+                holder2.bind(position, mClickListener);
+
+                GlideApp.with(mContext)
+                        .load(article.getImageUrlLink())
+                        .centerCrop()
+                        .placeholder(Utils.startProgressDrawable(mContext))
+                        .into(holder2.image);
+
+                holder2.title.setText(article.getTitle());
+                holder2.description.setText(article.getDescription());
+                break;
+            default:
+                break;
+        }
     }
 
     @Override

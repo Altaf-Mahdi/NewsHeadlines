@@ -17,6 +17,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.v7.widget.CardView
@@ -33,36 +34,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/image"
-                android:contentDescription="@string/article_image_description"
-                android:layout_width="@dimen/article_image_height"
-                android:layout_height="@dimen/article_image_height"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop" />
-
             <TextView
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/image"
-                android:layout_toEndOf="@id/image"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:maxLines="2"
                 android:padding="@dimen/article_title_padding"
                 android:textColor="@color/article_title"
-                android:maxLines="1"
-                android:textSize="@dimen/article_title" />
+                android:textSize="@dimen/article_title_main" />
+
+            <ImageView
+                android:id="@+id/image"
+                android:contentDescription="@string/article_image_description"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/article_image_height_main"
+                android:layout_below="@id/title"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop" />
 
             <TextView
                 android:id="@+id/description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/image"
-                android:layout_toEndOf="@id/image"
-                android:layout_below="@+id/title"
-                android:paddingLeft="@dimen/article_title_padding"
-                android:paddingRight="@dimen/article_title_padding"
-                android:paddingBottom="@dimen/article_title_padding"
-                android:maxLines="3"
+                android:layout_below="@+id/image"
+                android:padding="@dimen/article_title_padding"
+                android:maxLines="6"
                 android:textSize="@dimen/article_description" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
