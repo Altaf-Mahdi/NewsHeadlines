@@ -173,11 +173,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        View firstChild = mRecyclerView.getChildAt(0);
-        int firstVisiblePosition = mRecyclerView.getChildAdapterPosition(firstChild);
-        int offset = firstChild.getTop();
-        mPreferences.saveInt("position", firstVisiblePosition);
-        mPreferences.saveInt("offset", offset);
+        if (mRecyclerView != null) {
+            View firstChild = mRecyclerView.getChildAt(0);
+            int firstVisiblePosition = mRecyclerView.getChildAdapterPosition(firstChild);
+            int offset = firstChild.getTop();
+            mPreferences.saveInt("position", firstVisiblePosition);
+            mPreferences.saveInt("offset", offset);
+        }
     }
 
     @Override
@@ -253,6 +255,8 @@ public class MainActivity extends AppCompatActivity {
             ArticleUtils.parseJsonData(mArticles, mDownloadResult, true);
             mArticlesAdapter.notifyDataSetChanged();
             Utils.animateFab(v, false);
+            mRecyclerView.scrollToPosition(0);
+            mRecyclerView.scrollBy(0, 0);
         }
     };
 
@@ -371,6 +375,7 @@ public class MainActivity extends AppCompatActivity {
                 Utils.animateFab(mFloatingActionButton, true);
             } else if (mForceRunTask) {
                 mArticlesAdapter.notifyDataSetChanged();
+                Utils.animateFab(mFloatingActionButton, false);
             }
             mSwipeRefreshLayout.setRefreshing(false);
             mForceRunTask = false;
