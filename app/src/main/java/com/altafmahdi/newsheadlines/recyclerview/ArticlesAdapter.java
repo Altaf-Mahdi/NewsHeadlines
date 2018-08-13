@@ -122,6 +122,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         .load(article.getImageUrlLink())
                         .centerCrop()
                         .placeholder(Utils.startProgressDrawable(mContext))
+                        .error(R.drawable.ic_earth)
                         .into(holder1.image);
 
                 holder1.title.setText(article.getTitle());
@@ -135,6 +136,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         .load(article.getImageUrlLink())
                         .centerCrop()
                         .placeholder(Utils.startProgressDrawable(mContext))
+                        .error(R.drawable.ic_earth)
                         .into(holder2.image);
 
                 holder2.title.setText(article.getTitle());
