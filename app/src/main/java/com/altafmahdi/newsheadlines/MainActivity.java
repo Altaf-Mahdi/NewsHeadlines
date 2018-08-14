@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             ArticleUtils.parseJsonData(mArticles, mDownloadResult, true);
-            mArticlesAdapter.notifyDataSetChanged();
+            Utils.runRecyclerViewAnimation(mRecyclerView);
             Utils.animateFab(v, false);
             mRecyclerView.scrollToPosition(0);
             mRecyclerView.scrollBy(0, 0);
@@ -374,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
             if (ArticleUtils.hasDataChanged(mDataBaseHelper) && !mForceRunTask) {
                 Utils.animateFab(mFloatingActionButton, true);
             } else if (mForceRunTask) {
-                mArticlesAdapter.notifyDataSetChanged();
+                Utils.runRecyclerViewAnimation(mRecyclerView);
                 Utils.animateFab(mFloatingActionButton, false);
             }
             mSwipeRefreshLayout.setRefreshing(false);
