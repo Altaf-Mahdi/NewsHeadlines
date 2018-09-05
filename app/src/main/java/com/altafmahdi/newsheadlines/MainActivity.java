@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mArticlesAdapter);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.addOnScrollListener(mRecyclerScrollListener);
 
         mSadFaceImage = findViewById(R.id.sad_face_image);
         mNoInternetText = findViewById(R.id.no_internet_text);
@@ -234,6 +235,18 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private RecyclerView.OnScrollListener mRecyclerScrollListener =
+            new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            if (dy > 0 && mFloatingActionButton.getVisibility() == View.VISIBLE) {
+                mFloatingActionButton.hide();
+            } else if (dy < 0 && mFloatingActionButton.getVisibility() != View.VISIBLE) {
+                mFloatingActionButton.show();
+            }
+        }
+    };
+
     private SwipeRefreshLayout.OnRefreshListener mSwipeRefreshListener =
             new SwipeRefreshLayout.OnRefreshListener() {
         @Override
@@ -254,7 +267,9 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             ArticleUtils.parseJsonData(mArticles, mDownloadResult, true);
             Utils.runRecyclerViewAnimation(mRecyclerView);
-            Utils.animateFab(v, false);
+            if (mFloatingActionButton.getVisibility() == View.VISIBLE) {
+                mFloatingActionButton.hide();
+            }
             mRecyclerView.scrollToPosition(0);
             mRecyclerView.scrollBy(0, 0);
         }
@@ -372,10 +387,14 @@ public class MainActivity extends AppCompatActivity {
             if (DEBUG) Log.i(TAG,"News: " + mDownloadResult);
             ArticleUtils.parseJsonData(mArticles, mDownloadResult, mForceRunTask);
             if (ArticleUtils.hasDataChanged(mDataBaseHelper) && !mForceRunTask) {
-                Utils.animateFab(mFloatingActionButton, true);
+                if (mFloatingActionButton.getVisibility() != View.VISIBLE) {
+                    mFloatingActionButton.show();
+                }
             } else if (mForceRunTask) {
                 Utils.runRecyclerViewAnimation(mRecyclerView);
-                Utils.animateFab(mFloatingActionButton, false);
+                if (mFloatingActionButton.getVisibility() == View.VISIBLE) {
+                    mFloatingActionButton.hide();
+                }
             }
             mSwipeRefreshLayout.setRefreshing(false);
             mForceRunTask = false;

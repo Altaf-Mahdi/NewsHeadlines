@@ -91,36 +91,6 @@ public class Utils {
         return dir != null && dir.delete();
     }
 
-    public static void animateFab(final View view, boolean show) {
-        if (show) {
-            view.animate()
-                    .scaleX(1)
-                    .scaleY(1)
-                    .alpha(1f)
-                    .setDuration(300)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-                            super.onAnimationStart(animation);
-                            view.setVisibility(View.VISIBLE);
-                        }
-                    });
-        } else {
-            view.animate()
-                    .scaleX(0)
-                    .scaleY(0)
-                    .alpha(0f)
-                    .setDuration(300)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            view.setVisibility(View.GONE);
-                        }
-                    });
-        }
-    }
-
     public static void runRecyclerViewAnimation(final RecyclerView recyclerView) {
         final Context context = recyclerView.getContext();
         final LayoutAnimationController controller =
