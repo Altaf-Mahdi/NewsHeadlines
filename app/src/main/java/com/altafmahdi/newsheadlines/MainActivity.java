@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mArticlesAdapter);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addOnScrollListener(mRecyclerScrollListener);
 
         mSadFaceImage = findViewById(R.id.sad_face_image);
         mNoInternetText = findViewById(R.id.no_internet_text);
@@ -266,10 +265,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             ArticleUtils.parseJsonData(mArticles, mDownloadResult, true);
+            mPreferences.saveString("downloadResult", mDownloadResult);
             Utils.runRecyclerViewAnimation(mRecyclerView);
             if (mFloatingActionButton.getVisibility() == View.VISIBLE) {
                 mFloatingActionButton.hide();
             }
+            mRecyclerView.removeOnScrollListener(mRecyclerScrollListener);
             mRecyclerView.scrollToPosition(0);
             mRecyclerView.scrollBy(0, 0);
         }
@@ -386,15 +387,19 @@ public class MainActivity extends AppCompatActivity {
             mDownloadResult = intent.getStringExtra("download_result");
             if (DEBUG) Log.i(TAG,"News: " + mDownloadResult);
             ArticleUtils.parseJsonData(mArticles, mDownloadResult, mForceRunTask);
-            if (ArticleUtils.hasDataChanged(mDataBaseHelper) && !mForceRunTask) {
+            if (!mDownloadResult.equals(mPreferences.getString("downloadResult")) &&
+                    !mForceRunTask) {
                 if (mFloatingActionButton.getVisibility() != View.VISIBLE) {
                     mFloatingActionButton.show();
                 }
+                mRecyclerView.addOnScrollListener(mRecyclerScrollListener);
             } else if (mForceRunTask) {
+                mPreferences.saveString("downloadResult", mDownloadResult);
                 Utils.runRecyclerViewAnimation(mRecyclerView);
                 if (mFloatingActionButton.getVisibility() == View.VISIBLE) {
                     mFloatingActionButton.hide();
                 }
+                mRecyclerView.removeOnScrollListener(mRecyclerScrollListener);
             }
             mSwipeRefreshLayout.setRefreshing(false);
             mForceRunTask = false;

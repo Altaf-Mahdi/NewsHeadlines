@@ -34,8 +34,6 @@ public class ArticleUtils {
     private static final String TAG = "ArticleUtils";
     private static final boolean DEBUG = true;
 
-    private static String mCompareLink;
-
     public static void runDownloadTask(Context context, String value, boolean search) {
         if (DEBUG) Log.i(TAG, "Download task running");
         DownloadTask task = new DownloadTask(context);
@@ -69,10 +67,6 @@ public class ArticleUtils {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonPart = jsonArray.getJSONObject(i);
 
-                if (i == 0) {
-                    mCompareLink = jsonPart.getString("url");
-                }
-
                 String link = jsonPart.getString("url");
                 String image = jsonPart.getString("urlToImage");
                 String title = jsonPart.getString("title");
@@ -82,23 +76,9 @@ public class ArticleUtils {
                     list.add(new Article(link, image, title, description));
                 }
             }
-
-            if (DEBUG) Log.i(TAG,"Compare link: " + mCompareLink);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    public static boolean hasDataChanged(DataBaseHelper dataBaseHelper) {
-        Cursor cursor = dataBaseHelper.getData(String.valueOf(1));
-        String oldLink = "";
-        if (cursor.moveToFirst()) {
-            oldLink = cursor.getString(1);
-        }
-
-        if (DEBUG) Log.i(TAG,"Old link: " + oldLink);
-
-        return !oldLink.equals(mCompareLink);
     }
 
     public static void saveDataToDataBase(List<Article> list, DataBaseHelper dataBaseHelper) {
