@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final boolean DEBUG = true;
 
+    private static final String RECYCLER_VIEW_STATE = "recycler_view_state";
+
     private Toolbar mToolBar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
@@ -64,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView mSadFaceImage;
     private TextView mNoInternetText;
+
+    private Parcelable mRecyclerViewState;
 
     private ArticlesAdapter mArticlesAdapter;
     private List<Article> mArticles;
@@ -151,6 +156,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        mRecyclerViewState = mLayoutManager.onSaveInstanceState();
+        outState.putParcelable(RECYCLER_VIEW_STATE, mRecyclerViewState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mRecyclerViewState = savedInstanceState.getParcelable(RECYCLER_VIEW_STATE);
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         mSwipeRefreshLayout.setEnabled(true);
@@ -166,19 +188,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        mRecyclerView.scrollToPosition(mPreferences.getInt("position"));
-        mRecyclerView.scrollBy(0, - mPreferences.getInt("offset"));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mRecyclerView != null) {
-            View firstChild = mRecyclerView.getChildAt(0);
-            int firstVisiblePosition = mRecyclerView.getChildAdapterPosition(firstChild);
-            int offset = firstChild.getTop();
-            mPreferences.saveInt("position", firstVisiblePosition);
-            mPreferences.saveInt("offset", offset);
+        if (mRecyclerViewState != null) {
+            mLayoutManager.onRestoreInstanceState(mRecyclerViewState);
         }
     }
 
@@ -187,13 +198,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         Utils.deleteCache(getApplicationContext());
         ArticleUtils.saveDataToDataBase(mArticles, mDataBaseHelper);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mPreferences.saveInt("position", 0);
-        mPreferences.saveInt("offset", 0);
     }
 
     @Override
