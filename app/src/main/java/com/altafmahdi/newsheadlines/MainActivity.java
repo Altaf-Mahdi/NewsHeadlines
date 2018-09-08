@@ -17,9 +17,11 @@ package com.altafmahdi.newsheadlines;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -30,6 +32,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,9 +43,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.altafmahdi.newsheadlines.recyclerview.Article;
 import com.altafmahdi.newsheadlines.recyclerview.ArticleUtils;
@@ -59,14 +59,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String RECYCLER_VIEW_STATE = "recycler_view_state";
 
     private Toolbar mToolBar;
+    private AlertDialog mAlertDialog;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private DrawerLayout mDrawerLayout;
     private RecyclerView.LayoutManager mLayoutManager;
     private FloatingActionButton mFloatingActionButton;
-
-    private ImageView mSadFaceImage;
-    private TextView mNoInternetText;
 
     private Parcelable mRecyclerViewState;
 
@@ -87,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean mLastQueryWasSearch = false;
     private boolean mForceRunTask = false;
+    private boolean mNetworkStateReceiverRegistered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,15 +143,6 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mArticlesAdapter);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-
-        mSadFaceImage = findViewById(R.id.sad_face_image);
-        mNoInternetText = findViewById(R.id.no_internet_text);
-
-        if (!Utils.isNetworkAvailable(this)) {
-            mSadFaceImage.setVisibility(View.VISIBLE);
-            mNoInternetText.setVisibility(View.VISIBLE);
-            mRecyclerView.setVisibility(View.GONE);
-        }
     }
 
     @Override
@@ -178,14 +168,13 @@ public class MainActivity extends AppCompatActivity {
         mSwipeRefreshLayout.setEnabled(true);
 
         mToolBar.setTitle(mPreferences.getString("toolbar_title"));
-        if (Utils.isNetworkAvailable(this)) {
-            String provider = mPreferences.getString("provider");
-            String search = mPreferences.getString("search");
-            if (mPreferences.getBoolean("querySearch")) {
-                runTask(search, true);
-            } else {
-                runTask(provider, false);
-            }
+
+        String provider = mPreferences.getString("provider");
+        String search = mPreferences.getString("search");
+        if (mPreferences.getBoolean("querySearch")) {
+            runTask(search, true);
+        } else {
+            runTask(provider, false);
         }
 
         if (mRecyclerViewState != null) {
@@ -198,6 +187,9 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         Utils.deleteCache(getApplicationContext());
         ArticleUtils.saveDataToDataBase(mArticles, mDataBaseHelper);
+        if (mNetworkStateReceiverRegistered) {
+            unregisterReceiver(networkStateReceiver);
+        }
     }
 
     @Override
@@ -372,16 +364,29 @@ public class MainActivity extends AppCompatActivity {
     private void runTask(String provider, boolean search) {
         if (Utils.isNetworkAvailable(this)) {
             ArticleUtils.runDownloadTask(MainActivity.this, provider, search);
-            mSadFaceImage.setVisibility(View.GONE);
-            mNoInternetText.setVisibility(View.GONE);
-            mRecyclerView.setVisibility(View.VISIBLE);
             mLayoutManager.scrollToPosition(0);
             registerReceiver(mIntentReceiver, mIntentFilter);
+            if (mNetworkStateReceiverRegistered) {
+                unregisterReceiver(networkStateReceiver);
+                mNetworkStateReceiverRegistered = false;
+            }
         } else {
             mSwipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(MainActivity.this,
-                    mRes.getString(R.string.no_wifi_data_connection_text),
-                    Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this)
+                    .setMessage(mRes.getString(R.string.no_wifi_data_connection_text))
+                    .setCancelable(false)
+                    .setPositiveButton(mRes.getString(android.R.string.ok),
+                            new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            mAlertDialog = dialog.create();
+            mAlertDialog.show();
+            registerReceiver(networkStateReceiver,
+                    new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            mNetworkStateReceiverRegistered = true;
         }
     }
 
@@ -410,4 +415,20 @@ public class MainActivity extends AppCompatActivity {
             unregisterReceiver(this);
         }
     }
+
+    private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (Utils.isNetworkAvailable(context)) {
+                String provider = mPreferences.getString("provider");
+                String search = mPreferences.getString("search");
+                if (mPreferences.getBoolean("querySearch")) {
+                    runTask(search, true);
+                } else {
+                    runTask(provider, false);
+                }
+                mAlertDialog.dismiss();
+            }
+        }
+    };
 }
