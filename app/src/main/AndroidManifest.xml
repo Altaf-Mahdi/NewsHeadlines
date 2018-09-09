@@ -22,10 +22,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity">
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize">
         </activity>
         <activity
-            android:name=".WebActivity">
+            android:name=".WebActivity"
+            android:configChanges="orientation|screenSize">
         </activity>
     </application>
 
